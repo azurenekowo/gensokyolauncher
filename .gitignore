@@ -9,4 +9,8 @@ artifacts/
 publish/
 *.zip
 *.tar.gz
+artifacts/
+publish/
+*.zip
+*.tar.gz
 *.7z
