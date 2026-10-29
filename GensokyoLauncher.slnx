@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/GensokyoLauncher/GensokyoLauncher.csproj" />
+  <Project Path="tests/GensokyoLauncher.Tests/GensokyoLauncher.Tests.csproj" />
+</Solution>

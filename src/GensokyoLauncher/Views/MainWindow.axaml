@@ -1,0 +1,296 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GensokyoLauncher.ViewModels"
+        x:Class="GensokyoLauncher.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Gensokyo Launcher"
+        Width="1280" Height="720" MinWidth="720" MinHeight="500"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        TransparencyLevelHint="Mica, AcrylicBlur, None"
+        TransparencyBackgroundFallback="#17171D"
+        Icon="avares://GensokyoLauncher/Assets/Th04Reimu.png">
+  <Grid Background="#B817171D" ColumnDefinitions="72,*">
+    <Border Grid.Column="0" Background="#5A111116" BorderBrush="#18FFFFFF" BorderThickness="0,0,1,0">
+      <Grid RowDefinitions="Auto,*,Auto" Margin="14,20">
+        <Image Source="avares://GensokyoLauncher/Assets/Th04Reimu.png"
+               Width="42" Height="42" Stretch="Uniform" HorizontalAlignment="Center" />
+        <StackPanel Grid.Row="1" VerticalAlignment="Center">
+          <Button Classes="nav" Command="{Binding ShowGamesCommand}" ToolTip.Tip="Games">
+            <PathIcon Width="20" Height="20" Data="M3,5 L21,5 L21,19 L3,19 Z M6,8 L10,8 L10,12 L6,12 Z M13,9 L18,9 M13,12 L18,12 M6,15 L18,15" />
+          </Button>
+          <Button Classes="nav" Command="{Binding ShowSettingsCommand}" ToolTip.Tip="Settings">
+            <PathIcon Width="21" Height="21" Data="M12,8.5 A3.5,3.5 0 1 0 12,15.5 A3.5,3.5 0 1 0 12,8.5 M19.4,13 A7.6,7.6 0 0 0 19.4,11 L21.2,9.6 L19.2,6.2 L17,7.1 A8,8 0 0 0 15.3,6.1 L15,3.8 L11,3.8 L10.7,6.1 A8,8 0 0 0 9,7.1 L6.8,6.2 L4.8,9.6 L6.6,11 A7.6,7.6 0 0 0 6.6,13 L4.8,14.4 L6.8,17.8 L9,16.9 A8,8 0 0 0 10.7,17.9 L11,20.2 L15,20.2 L15.3,17.9 A8,8 0 0 0 17,16.9 L19.2,17.8 L21.2,14.4 Z" />
+          </Button>
+          <Button Classes="nav" Command="{Binding ShowAboutCommand}" ToolTip.Tip="About">
+            <PathIcon Width="21" Height="21" Data="M12,2 A10,10 0 1 0 12,22 A10,10 0 1 0 12,2 M11,10 L13,10 L13,18 L11,18 Z M11,6 L13,6 L13,8 L11,8 Z" />
+          </Button>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Carousel x:Name="MainCarousel" Grid.Column="1" Margin="36,30" SelectedIndex="{Binding SelectedPage}">
+      <Carousel.PageTransition>
+        <CompositePageTransition>
+          <CrossFade Duration="0:00:00.220" />
+          <PageSlide Duration="0:00:00.220" Orientation="Vertical" />
+        </CompositePageTransition>
+      </Carousel.PageTransition>
+      <Grid RowDefinitions="Auto,Auto,*">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel>
+            <TextBlock Text="Games" FontSize="30" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding ScanStatus}" Opacity="0.65" Margin="0,5,0,0" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+            <ComboBox Width="190" Height="38" SelectedIndex="{Binding SelectedGroupingMode, Mode=TwoWay}" ToolTip.Tip="Game grouping">
+              <ComboBoxItem Content="All" />
+              <ComboBoxItem Content="Group by Series" />
+            </ComboBox>
+            <ComboBox Width="164" Height="38" SelectedIndex="{Binding SelectedViewMode, Mode=TwoWay}" ToolTip.Tip="Game view">
+              <ComboBoxItem Content="Cards" />
+              <ComboBoxItem Content="Horizontal cards" />
+            </ComboBox>
+            <Button Classes="toolbarIcon" Click="ChooseFolder_OnClick" ToolTip.Tip="Choose games folder">
+              <PathIcon Width="20" Height="20" Data="M2,6 L2,19 L22,19 L22,7 L11,7 L9,4 L2,4 Z M4,9 L20,9 L20,17 L4,17 Z" />
+            </Button>
+            <Button Classes="toolbarIcon" Command="{Binding RescanCommand}" ToolTip.Tip="Rescan games">
+              <PathIcon Width="20" Height="20" Data="M17.65,6.35 A8,8 0 1 0 19.73,14 L17.65,14 A6,6 0 1 1 16.24,7.76 L13,11 L22,11 L22,2 Z" />
+            </Button>
+          </StackPanel>
+        </Grid>
+        <Border Grid.Row="1" IsVisible="{Binding HasGlobalError}" Background="#44C42B1C" CornerRadius="8" Padding="12" Margin="0,18,0,0">
+          <TextBlock Text="{Binding GlobalError}" TextWrapping="Wrap" />
+        </Border>
+        <Grid Grid.Row="2" Margin="0,24,0,0">
+          <StackPanel IsVisible="{Binding ShowEmptyState}" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+            <TextBlock Text="No games here yet" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" />
+            <TextBlock Text="Choose a parent folder containing official Touhou game executables.&#10;The launcher searches its subfolders automatically."
+                       TextAlignment="Center" Opacity="0.65" />
+            <Button Content="Choose games folder" HorizontalAlignment="Center" Click="ChooseFolder_OnClick" />
+          </StackPanel>
+          <Grid IsVisible="{Binding HasGames}">
+            <ScrollViewer IsVisible="{Binding IsCardView}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+              <ItemsControl ItemsSource="{Binding GameGroups}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:GameGroupViewModel">
+                    <StackPanel Margin="0,0,0,20">
+                      <TextBlock Text="{Binding Title}" IsVisible="{Binding ShowHeading}" FontSize="18" FontWeight="SemiBold" Margin="4,0,0,10" />
+                      <ItemsControl ItemsSource="{Binding Games}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" ItemWidth="188" ItemHeight="268" />
+                          </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:GameItemViewModel">
+                            <StackPanel Width="188">
+                              <Button Classes="gameTile" Command="{Binding LaunchCommand}" ToolTip.Tip="{Binding ExecutablePath}">
+                                <Button.ContextMenu>
+                                  <ContextMenu>
+                                    <MenuItem Header="Open directory" Command="{Binding OpenDirectoryCommand}" />
+                                    <MenuItem Header="Properties" Command="{Binding PropertiesCommand}" />
+                                  </ContextMenu>
+                                </Button.ContextMenu>
+                      <Border Classes="tileSurface" Background="{Binding CardBrush}" CornerRadius="4" ClipToBounds="True">
+                        <Grid>
+                          <Image Source="{Binding CoverImage}" IsVisible="{Binding HasCover}" Stretch="UniformToFill" />
+                          <Grid IsVisible="{Binding !HasCover}">
+                            <TextBlock Text="幻想郷" FontSize="17" FontWeight="SemiBold" Opacity="0.18"
+                                       Margin="14" VerticalAlignment="Top" HorizontalAlignment="Right" />
+                            <TextBlock Text="{Binding GameNumber}" FontSize="72" FontWeight="Bold" Opacity="0.14"
+                                       Margin="8,0" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            <StackPanel VerticalAlignment="Bottom" Margin="14,0,14,17" Spacing="3">
+                              <TextBlock Text="TOUHOU PROJECT" FontSize="9" FontWeight="Bold" Opacity="0.65" />
+                              <TextBlock Text="{Binding CatalogId}" FontSize="27" FontWeight="Black" />
+                            </StackPanel>
+                          </Grid>
+                          <Border VerticalAlignment="Bottom" Height="82">
+                            <Border.Background>
+                              <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                                <GradientStop Color="#00101116" Offset="0" />
+                                <GradientStop Color="#E6101116" Offset="0.68" />
+                                <GradientStop Color="#FA101116" Offset="1" />
+                              </LinearGradientBrush>
+                            </Border.Background>
+                            <TextBlock Text="{Binding ShortTitle}" FontSize="12" FontWeight="SemiBold"
+                                       TextWrapping="Wrap" MaxLines="2" TextAlignment="Center"
+                                       HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10,0,10,12" />
+                          </Border>
+                        </Grid>
+                      </Border>
+                              </Button>
+                              <TextBlock Text="{Binding Status}" IsVisible="{Binding HasStatus}" Foreground="#FF9ECFFF"
+                                         FontSize="10" TextTrimming="CharacterEllipsis" Margin="8,2" ToolTip.Tip="{Binding Status}" />
+                              <TextBlock Text="{Binding Error}" IsVisible="{Binding HasError}" Foreground="#FFFF8A80"
+                                         FontSize="10" TextTrimming="CharacterEllipsis" Margin="8,2" ToolTip.Tip="{Binding Error}" />
+                            </StackPanel>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+            <ScrollViewer IsVisible="{Binding IsHorizontalCardView}" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+              <ItemsControl ItemsSource="{Binding GameGroups}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:GameGroupViewModel">
+                    <StackPanel Margin="0,0,0,20">
+                      <TextBlock Text="{Binding Title}" IsVisible="{Binding ShowHeading}" FontSize="18" FontWeight="SemiBold" Margin="4,0,0,10" />
+                      <ItemsControl ItemsSource="{Binding Games}">
+                        <ItemsControl.ItemsPanel>
+                          <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" ItemWidth="292" ItemHeight="192" />
+                          </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:GameItemViewModel">
+                            <StackPanel Width="292">
+                              <Button Classes="horizontalTile" Command="{Binding LaunchCommand}" ToolTip.Tip="{Binding ExecutablePath}">
+                                <Button.ContextMenu>
+                                  <ContextMenu>
+                                    <MenuItem Header="Open directory" Command="{Binding OpenDirectoryCommand}" />
+                                    <MenuItem Header="Properties" Command="{Binding PropertiesCommand}" />
+                                  </ContextMenu>
+                                </Button.ContextMenu>
+                                <Border Background="#A01B1B22" BorderBrush="#20FFFFFF" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+                                  <Grid RowDefinitions="126,*">
+                                    <Border Background="{Binding CardBrush}">
+                                      <Grid>
+                                        <Image Source="{Binding CoverImage}" IsVisible="{Binding HasCover}" Stretch="UniformToFill" />
+                                        <TextBlock Text="{Binding CatalogId}" IsVisible="{Binding !HasCover}" FontSize="30" FontWeight="Bold"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.75" />
+                                        <Border VerticalAlignment="Bottom" Height="54">
+                                          <Border.Background>
+                                            <LinearGradientBrush StartPoint="50%,0%" EndPoint="50%,100%">
+                                              <GradientStop Color="#00101116" Offset="0" />
+                                              <GradientStop Color="#D0101116" Offset="1" />
+                                            </LinearGradientBrush>
+                                          </Border.Background>
+                                        </Border>
+                                      </Grid>
+                                    </Border>
+                                    <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="12,0,10,0">
+                                      <TextBlock Text="{Binding ShortTitle}" FontSize="13" FontWeight="SemiBold"
+                                                 VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                      <PathIcon Grid.Column="1" Width="15" Height="15" VerticalAlignment="Center"
+                                                Data="M8,5 L19,12 L8,19 Z" Opacity="0.65" />
+                                    </Grid>
+                                  </Grid>
+                                </Border>
+                              </Button>
+                              <TextBlock Text="{Binding Status}" IsVisible="{Binding HasStatus}" Foreground="#FF9ECFFF"
+                                         FontSize="10" TextTrimming="CharacterEllipsis" Margin="8,0,8,6" ToolTip.Tip="{Binding Status}" />
+                              <TextBlock Text="{Binding Error}" IsVisible="{Binding HasError}" Foreground="#FFFF8A80"
+                                         FontSize="10" TextTrimming="CharacterEllipsis" Margin="8,0,8,6" ToolTip.Tip="{Binding Error}" />
+                            </StackPanel>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Grid>
+        </Grid>
+      </Grid>
+
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="22" HorizontalAlignment="Stretch" Margin="0,0,18,0">
+          <TextBlock Text="Settings" FontSize="30" FontWeight="SemiBold" />
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Games folder" FontSize="17" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding GamesRoot}" Opacity="0.65" TextWrapping="Wrap" />
+              <Button Content="Change folder" HorizontalAlignment="Left" Click="ChooseFolder_OnClick" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="12">
+              <TextBlock Text="Appearance" FontSize="17" FontWeight="SemiBold" />
+              <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto" RowSpacing="10">
+                <TextBlock Text="Window backdrop" VerticalAlignment="Center" Opacity="0.7" />
+                <ComboBox Grid.Column="1" SelectedIndex="{Binding SelectedBackdropMode, Mode=TwoWay}">
+                  <ComboBoxItem Content="Mica" />
+                  <ComboBoxItem Content="Acrylic" />
+                  <ComboBoxItem Content="Opaque" />
+                </ComboBox>
+                <TextBlock Grid.Row="1" Text="Tab animation" VerticalAlignment="Center" Opacity="0.7" />
+                <ComboBox Grid.Row="1" Grid.Column="1" SelectedIndex="{Binding SelectedTabAnimationMode, Mode=TwoWay}">
+                  <ComboBoxItem Content="Vertical" />
+                  <ComboBoxItem Content="Horizontal" />
+                  <ComboBoxItem Content="Disabled" />
+                </ComboBox>
+              </Grid>
+              <TextBlock Text="Backdrop effects depend on operating-system support and fall back safely when unavailable."
+                         Opacity="0.45" FontSize="12" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Neko Project II" FontSize="17" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding NekoProjectStatus}" Opacity="0.65" TextWrapping="Wrap" />
+              <TextBlock Text="Bundled automatically for launching discovered PC-98 disk images." Opacity="0.45" FontSize="12" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="thprac" FontSize="17" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding ThpracStatus}" Opacity="0.65" TextWrapping="Wrap" />
+              <Button Content="Check / retry" HorizontalAlignment="Left" Command="{Binding RetryThpracCommand}" />
+              <TextBlock Text="Touhou practice tools can be enabled independently on each launch profile." Opacity="0.45" FontSize="12" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="THCRAP" FontSize="17" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding ThcrapStatus}" Opacity="0.65" TextWrapping="Wrap" />
+              <Button Content="Check / retry" HorizontalAlignment="Left" Command="{Binding RetryThcrapCommand}" />
+              <TextBlock Text="Launch profiles" FontSize="15" FontWeight="SemiBold" Margin="0,10,0,0" />
+              <TextBlock Text="{Binding GlobalDefaultProfile.Name, StringFormat='Global default: {0}'}" Opacity="0.65" />
+              <Button Content="Manage profiles" HorizontalAlignment="Left" Click="ManageProfiles_OnClick" />
+              <TextBlock Text="Official language IDs use the lang_* names published by Touhou Patch Center. Language patches are applied per game when launched." Opacity="0.45" FontSize="12" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card" IsVisible="{OnPlatform False, Windows=False, Linux=True, macOS=True}">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Linux runner" FontSize="17" FontWeight="SemiBold" />
+              <TextBlock Text="Wine command" Opacity="0.65" />
+              <TextBox Text="{Binding WineCommand}" Watermark="wine" />
+              <Button Content="Save" HorizontalAlignment="Left" Click="SaveSettings_OnClick" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="22" HorizontalAlignment="Stretch" Margin="0,0,18,0">
+          <StackPanel Spacing="5">
+            <TextBlock Text="About" FontSize="30" FontWeight="SemiBold" />
+            <TextBlock Text="Gensokyo Launcher" FontSize="18" Opacity="0.75" />
+            <TextBlock Text="{Binding AppVersion}" Opacity="0.55" />
+          </StackPanel>
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Credits" FontSize="17" FontWeight="SemiBold" />
+              <TextBlock Text="Built with Avalonia UI." Opacity="0.7" />
+              <TextBlock Text="THCRAP and language patches @ Touhou Patch Center contributors" Opacity="0.7" TextWrapping="Wrap" />
+              <TextBlock Text="thprac @ Touhou World Cup and thprac contributors" Opacity="0.7" TextWrapping="Wrap" />
+              <TextBlock Text="Neko Project II @ Neko Project II contributors" Opacity="0.7" TextWrapping="Wrap" />
+              <TextBlock Text="From azurenekowo with 💜" Opacity="0.7" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="10">
+              <TextBlock Text="Touhou Project" FontSize="17" FontWeight="SemiBold" />
+              <TextBlock Text="Touhou Project is created by ZUN / Team Shanghai Alice. Gensokyo Launcher is an unofficial fan project and is not affiliated with or endorsed by Team Shanghai Alice." Opacity="0.65" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </ScrollViewer>
+    </Carousel>
+  </Grid>
+</Window>
