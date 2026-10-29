@@ -16,11 +16,6 @@ Gensokyo Launcher discovers games in a folder you choose, keeps launch settings 
 - Manage per-profile display mode, resolution, language, and thprac settings.
 - Install and use THCRAP language patches per profile.
 - Install thprac practice tools per profile.
-- Select custom executables from each game's Properties dialog.
-- Open game directories and inspect executable details from card context menus.
-- Configure Mica, Acrylic, or opaque window backdrops.
-- Configure vertical, horizontal, or disabled tab animations.
-- Switch between card and horizontal-card game views.
 
 ## Download
 
