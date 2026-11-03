@@ -7,7 +7,7 @@
         Width="1280" Height="720" MinWidth="720" MinHeight="500"
         WindowStartupLocation="CenterScreen"
         Background="Transparent"
-        TransparencyLevelHint="Mica, AcrylicBlur, None"
+        TransparencyLevelHint="Mica, AcrylicBlur, Blur, None"
         TransparencyBackgroundFallback="#17171D"
         Icon="avares://GensokyoLauncher/Assets/Th04Reimu.png">
   <Grid Background="#B817171D" ColumnDefinitions="72,*">
@@ -213,10 +213,14 @@
               <TextBlock Text="Appearance" FontSize="17" FontWeight="SemiBold" />
               <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto" RowSpacing="10">
                 <TextBlock Text="Window backdrop" VerticalAlignment="Center" Opacity="0.7" />
-                <ComboBox Grid.Column="1" SelectedIndex="{Binding SelectedBackdropMode, Mode=TwoWay}">
-                  <ComboBoxItem Content="Mica" />
-                  <ComboBoxItem Content="Acrylic" />
-                  <ComboBoxItem Content="Opaque" />
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding BackdropOptions}"
+                          SelectedItem="{Binding SelectedBackdropOption, Mode=TwoWay}">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:BackdropOption">
+                      <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                  </ComboBox.ItemTemplate>
                 </ComboBox>
                 <TextBlock Grid.Row="1" Text="Tab animation" VerticalAlignment="Center" Opacity="0.7" />
                 <ComboBox Grid.Row="1" Grid.Column="1" SelectedIndex="{Binding SelectedTabAnimationMode, Mode=TwoWay}">

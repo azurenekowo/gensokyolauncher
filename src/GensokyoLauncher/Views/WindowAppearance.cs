@@ -22,8 +22,9 @@ internal static class WindowAppearance
                 window.Background = OpaqueBackground;
                 break;
             default:
-                window.TransparencyLevelHint =
-                    [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.None];
+                window.TransparencyLevelHint = OperatingSystem.IsLinux()
+                    ? [WindowTransparencyLevel.Blur, WindowTransparencyLevel.Transparent, WindowTransparencyLevel.None]
+                    : [WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.None];
                 window.Background = Brushes.Transparent;
                 break;
         }

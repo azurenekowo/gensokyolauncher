@@ -4,6 +4,8 @@ using GensokyoLauncher.Services;
 
 namespace GensokyoLauncher.ViewModels;
 
+public sealed record BackdropOption(string Name, int Mode);
+
 public sealed class MainWindowViewModel : ObservableObject
 {
     private readonly ISettingsService _settingsService;
@@ -101,17 +103,46 @@ public sealed class MainWindowViewModel : ObservableObject
     }
     public bool IsCardView => SelectedViewMode == 0;
     public bool IsHorizontalCardView => SelectedViewMode == 1;
+    public IReadOnlyList<BackdropOption> BackdropOptions { get; } = CreateBackdropOptions();
+    public BackdropOption SelectedBackdropOption
+    {
+        get => BackdropOptions.First(option => option.Mode == SelectedBackdropMode);
+        set
+        {
+            if (value is not null)
+                SelectedBackdropMode = value.Mode;
+        }
+    }
     public int SelectedBackdropMode
     {
         get => _settings.AppearanceBackdropMode;
         set
         {
-            var normalized = value is >= 0 and <= 2 ? value : 0;
+            var normalized = NormalizeBackdropMode(value);
             if (_settings.AppearanceBackdropMode == normalized) return;
             _settings.AppearanceBackdropMode = normalized;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(SelectedBackdropOption));
             _ = _settingsService.SaveAsync(_settings);
         }
+    }
+
+    private static IReadOnlyList<BackdropOption> CreateBackdropOptions()
+    {
+        if (OperatingSystem.IsLinux())
+            return [new("Mica", 0), new("Opaque", 2)];
+        if (OperatingSystem.IsWindows())
+            return [new("Acrylic", 1), new("Opaque", 2)];
+        return [new("Mica", 0), new("Acrylic", 1), new("Opaque", 2)];
+    }
+
+    private static int NormalizeBackdropMode(int value)
+    {
+        if (OperatingSystem.IsLinux())
+            return value is 0 or 2 ? value : 0;
+        if (OperatingSystem.IsWindows())
+            return value is 1 or 2 ? value : 1;
+        return value is >= 0 and <= 2 ? value : 0;
     }
     public int SelectedTabAnimationMode
     {
@@ -186,6 +217,7 @@ public sealed class MainWindowViewModel : ObservableObject
         if (_initialized) return !HasGamesRoot;
         _initialized = true;
         _settings = await _settingsService.LoadAsync();
+        _settings.AppearanceBackdropMode = NormalizeBackdropMode(_settings.AppearanceBackdropMode);
         _settings.NormalizeProfiles();
         await _settingsService.SaveAsync(_settings);
         OnSettingsChanged();
@@ -431,6 +463,7 @@ public sealed class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(IsHorizontalCardView));
         OnPropertyChanged(nameof(SelectedGroupingMode));
         OnPropertyChanged(nameof(SelectedBackdropMode));
+        OnPropertyChanged(nameof(SelectedBackdropOption));
         OnPropertyChanged(nameof(SelectedTabAnimationMode));
         RescanCommand.RaiseCanExecuteChanged();
         RetryThcrapCommand.RaiseCanExecuteChanged();
