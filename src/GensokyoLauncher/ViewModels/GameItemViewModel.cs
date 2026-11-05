@@ -109,16 +109,7 @@ public sealed class GameItemViewModel : ObservableObject
 
     private static Bitmap? LoadCover(string id)
     {
-        if (id.Length != 4)
-            return null;
-
-        var extension = id switch
-        {
-            "th01" or "th02" or "th03" or "th04" or "th05" => "webp",
-            "th19" => "png",
-            _ => "jpg"
-        };
-        var assetName = $"Th{id[2..]}cover.{extension}";
+        var assetName = $"th_{id[2..]}_cover.jpg";
         var uri = new Uri($"avares://GensokyoLauncher/Assets/{assetName}");
         return AssetLoader.Exists(uri) ? new Bitmap(AssetLoader.Open(uri)) : null;
     }

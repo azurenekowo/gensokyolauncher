@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
+    <!-- net10.0 is the primary target; net6.0 is kept for the best-effort Windows 7 build. -->
+    <TargetFrameworks>net10.0;net6.0</TargetFrameworks>
+    <!-- Required so C# 12+ language features (collection expressions) compile against net6.0. -->
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>

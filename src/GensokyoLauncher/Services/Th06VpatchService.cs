@@ -5,15 +5,17 @@ namespace GensokyoLauncher.Services;
 
 public sealed class Th06VpatchService
 {
-    private static readonly Lock ConfigurationLock = new();
+    // System.Threading.Lock is not available on the net6.0 (Windows 7) target.
+    private static readonly object ConfigurationLock = new();
 
     public string PrepareLaunchExecutable(string gameExecutable, LaunchProfile profile)
     {
-        if (!IsTouhouSixExecutable(gameExecutable)) return gameExecutable;
+        if (!SupportsVpatch(gameExecutable)) return gameExecutable;
         var directory = Path.GetDirectoryName(gameExecutable) ?? Environment.CurrentDirectory;
         var originalExecutable = Path.Combine(directory, "東方紅魔郷.exe");
         var vpatchExecutable = Path.Combine(directory, "vpatch.exe");
-        if (!File.Exists(originalExecutable) || !File.Exists(vpatchExecutable)) return gameExecutable;
+        if (!File.Exists(vpatchExecutable)
+            || (IsTouhouSixExecutable(gameExecutable) && !File.Exists(originalExecutable))) return gameExecutable;
 
         lock (ConfigurationLock)
         {
@@ -26,7 +28,7 @@ public sealed class Th06VpatchService
                 text = SetValue(text, "Window", "enabled", "1");
                 text = SetValue(text, "Window", "Width", profile.WindowWidth.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 text = SetValue(text, "Window", "Height", profile.WindowHeight.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                EnsureWindowedGameConfiguration(directory);
+                if (IsTouhouSixExecutable(gameExecutable)) EnsureWindowedGameConfiguration(directory);
             }
             var temporary = configurationPath + ".gensokyo.tmp";
             File.WriteAllText(temporary, text);
@@ -90,6 +92,17 @@ public sealed class Th06VpatchService
         && (string.Equals(name, "th06.exe", StringComparison.OrdinalIgnoreCase)
             || string.Equals(name, "東方紅魔郷.exe", StringComparison.OrdinalIgnoreCase)
             || IsStandaloneThpatchWrapper(path));
+
+    private static bool SupportsVpatch(string path)
+    {
+        if (IsTouhouSixExecutable(path)) return true;
+        var name = Path.GetFileNameWithoutExtension(path);
+        return Path.GetExtension(path).Equals(".exe", StringComparison.OrdinalIgnoreCase)
+            && name.Length == 4
+            && name.StartsWith("th", StringComparison.OrdinalIgnoreCase)
+            && int.TryParse(name.AsSpan(2), out var number)
+            && number is >= 7 and <= 19;
+    }
 
     private static string SetValue(string text, string section, string key, string value)
     {

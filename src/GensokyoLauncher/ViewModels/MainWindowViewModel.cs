@@ -131,8 +131,12 @@ public sealed class MainWindowViewModel : ObservableObject
     {
         if (OperatingSystem.IsLinux())
             return [new("Mica", 0), new("Opaque", 2)];
+        if (OperatingSystem.IsWindows() && !OperatingSystem.IsWindowsVersionAtLeast(10))
+            // Windows 7 (and Windows 8) have no Mica/Acrylic; the platform-native glass effect is Aero.
+            // On Windows 8 Aero falls back to opaque, and a stored Acrylic value maps onto Aero.
+            return [new("Aero", 0), new("Opaque", 2)];
         if (OperatingSystem.IsWindows())
-            return [new("Acrylic", 1), new("Opaque", 2)];
+            return [new("Mica", 0), new("Acrylic", 1), new("Opaque", 2)];
         return [new("Mica", 0), new("Acrylic", 1), new("Opaque", 2)];
     }
 
@@ -140,8 +144,11 @@ public sealed class MainWindowViewModel : ObservableObject
     {
         if (OperatingSystem.IsLinux())
             return value is 0 or 2 ? value : 0;
+        if (OperatingSystem.IsWindows() && !OperatingSystem.IsWindowsVersionAtLeast(10))
+            // The Aero/Opaque pair has no Acrylic entry; map a stored Acrylic value onto Aero.
+            return value is not 2 ? 0 : 2;
         if (OperatingSystem.IsWindows())
-            return value is 1 or 2 ? value : 1;
+            return value is >= 0 and <= 2 ? value : 0;
         return value is >= 0 and <= 2 ? value : 0;
     }
     public int SelectedTabAnimationMode

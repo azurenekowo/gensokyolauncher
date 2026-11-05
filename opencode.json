@@ -1,0 +1,10 @@
+{
+  "mcp": {
+    "servers": {
+      "tavily": {
+        "type": "remote",
+        "url": "https://mcp.tavily.com/mcp/"
+      }
+    }
+  }
+}

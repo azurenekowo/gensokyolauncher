@@ -1,4 +1,5 @@
 using GensokyoLauncher.Services;
+using GensokyoLauncher.Models;
 
 namespace GensokyoLauncher.Tests;
 
@@ -7,6 +8,15 @@ public sealed class GameDiscoveryServiceTests : IDisposable
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"gensokyo-tests-{Guid.NewGuid():N}");
 
     public GameDiscoveryServiceTests() => Directory.CreateDirectory(_root);
+
+    [Fact]
+    public void ImpossibleSpellCardAnd100thBlackMarketAreOfficialSpinoffs()
+    {
+        var games = GameCatalog.All.ToDictionary(game => game.Id);
+
+        Assert.Equal(GameCategory.OffMainline, games["th143"].Category);
+        Assert.Equal(GameCategory.OffMainline, games["th185"].Category);
+    }
 
     [Fact]
     public async Task DiscoversKnownExecutablesAndIgnoresUnknownFiles()

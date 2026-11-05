@@ -95,17 +95,39 @@ public sealed class Th06VpatchServiceTests : IDisposable
     }
 
     [Fact]
-    public void OtherGamesAndIncompleteVpatchSetupsAreUnchanged()
+    public void MountainOfFaithUsesVpatchWithProfileDimensions()
     {
-        var th07 = Path.Combine(_root, "th07.exe");
-        var th06 = Path.Combine(_root, "th06.exe");
-        File.WriteAllText(th07, "game");
-        File.WriteAllText(th06, "game");
+        var th10 = Path.Combine(_root, "th10.exe");
+        File.WriteAllText(th10, "game");
         File.WriteAllText(Path.Combine(_root, "vpatch.exe"), "vpatch");
+        var profile = new LaunchProfile
+        {
+            DisplayMode = LaunchDisplayMode.Windowed,
+            WindowWidth = 1280,
+            WindowHeight = 960
+        };
+
+        var executable = new Th06VpatchService().PrepareLaunchExecutable(th10, profile);
+
+        Assert.Equal(Path.Combine(_root, "vpatch.exe"), executable);
+        var configuration = File.ReadAllText(Path.Combine(_root, "vpatch.ini"));
+        Assert.Contains("enabled = 1", configuration, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Width = 1280", configuration);
+        Assert.Contains("Height = 960", configuration);
+        Assert.False(File.Exists(Path.Combine(_root, "東方紅魔郷.cfg")));
+    }
+
+    [Fact]
+    public void NonTouhouGamesAndIncompleteVpatchSetupsAreUnchanged()
+    {
+        var otherGame = Path.Combine(_root, "other.exe");
+        var th10 = Path.Combine(_root, "th10.exe");
+        File.WriteAllText(otherGame, "game");
+        File.WriteAllText(th10, "game");
         var service = new Th06VpatchService();
 
-        Assert.Equal(th07, service.PrepareLaunchExecutable(th07, LaunchProfile.English()));
-        Assert.Equal(th06, service.PrepareLaunchExecutable(th06, LaunchProfile.English()));
+        Assert.Equal(otherGame, service.PrepareLaunchExecutable(otherGame, LaunchProfile.English()));
+        Assert.Equal(th10, service.PrepareLaunchExecutable(th10, LaunchProfile.English()));
         Assert.False(File.Exists(Path.Combine(_root, "vpatch.ini")));
     }
 

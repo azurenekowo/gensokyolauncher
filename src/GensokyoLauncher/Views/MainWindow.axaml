@@ -9,11 +9,11 @@
         Background="Transparent"
         TransparencyLevelHint="Mica, AcrylicBlur, Blur, None"
         TransparencyBackgroundFallback="#17171D"
-        Icon="avares://GensokyoLauncher/Assets/Th04Reimu.png">
+        Icon="avares://GensokyoLauncher/Assets/launcher_icon.png">
   <Grid Background="#B817171D" ColumnDefinitions="72,*">
     <Border Grid.Column="0" Background="#5A111116" BorderBrush="#18FFFFFF" BorderThickness="0,0,1,0">
       <Grid RowDefinitions="Auto,*,Auto" Margin="14,20">
-        <Image Source="avares://GensokyoLauncher/Assets/Th04Reimu.png"
+        <Image Source="avares://GensokyoLauncher/Assets/launcher_icon.png"
                Width="42" Height="42" Stretch="Uniform" HorizontalAlignment="Center" />
         <StackPanel Grid.Row="1" VerticalAlignment="Center">
           <Button Classes="nav" Command="{Binding ShowGamesCommand}" ToolTip.Tip="Games">

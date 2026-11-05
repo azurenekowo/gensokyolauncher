@@ -27,7 +27,7 @@ public static class GameCatalog
         new("th13", "Touhou 13 — Ten Desires", GameCategory.Mainline, "th13.exe"),
         new("th135", "Touhou 13.5 — Hopeless Masquerade", GameCategory.OffMainline, "th135.exe"),
         new("th14", "Touhou 14 — Double Dealing Character", GameCategory.Mainline, "th14.exe"),
-        new("th143", "Touhou 14.3 — Impossible Spell Card", GameCategory.Mainline, "th143.exe"),
+        new("th143", "Touhou 14.3 — Impossible Spell Card", GameCategory.OffMainline, "th143.exe"),
         new("th145", "Touhou 14.5 — Urban Legend in Limbo", GameCategory.OffMainline, "th145.exe"),
         new("th15", "Touhou 15 — Legacy of Lunatic Kingdom", GameCategory.Mainline, "th15.exe"),
         new("th155", "Touhou 15.5 — Antinomy of Common Flowers", GameCategory.OffMainline, "th155.exe"),
@@ -36,7 +36,7 @@ public static class GameCatalog
         new("th17", "Touhou 17 — Wily Beast and Weakest Creature", GameCategory.Mainline, "th17.exe"),
         new("th175", "Touhou 17.5 — Sunken Fossil World", GameCategory.OffMainline, "th175.exe"),
         new("th18", "Touhou 18 — Unconnected Marketeers", GameCategory.Mainline, "th18.exe"),
-        new("th185", "Touhou 18.5 — 100th Black Market", GameCategory.Mainline, "th185.exe"),
+        new("th185", "Touhou 18.5 — 100th Black Market", GameCategory.OffMainline, "th185.exe"),
         new("th19", "Touhou 19 — Unfinished Dream of All Living Ghost", GameCategory.Mainline, "th19.exe"),
         new("th20", "Touhou 20 — Fossilized Wonders", GameCategory.Mainline, "th20.exe")
     ];

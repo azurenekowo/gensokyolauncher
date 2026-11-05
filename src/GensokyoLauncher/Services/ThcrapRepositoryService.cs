@@ -438,9 +438,13 @@ public sealed class ThcrapRepositoryService : IThcrapRepositoryService, IThcrapP
     private static Uri EnsureTrailingSlash(Uri uri) => uri.AbsoluteUri.EndsWith('/') ? uri : new Uri(uri.AbsoluteUri + "/");
     private static string EscapePath(string path) => string.Join('/', path.Replace('\\', '/').Split('/').Select(Uri.EscapeDataString));
 
+    // char.IsAsciiLetterOrDigit is not available on the net6.0 (Windows 7) target.
+    private static bool IsAsciiLetterOrDigit(char character) =>
+        character is (>= 'a' and <= 'z') or (>= 'A' and <= 'Z') or (>= '0' and <= '9');
+
     private static void ValidateId(string value, string kind)
     {
-        if (value.Length == 0 || value.Any(character => !(char.IsAsciiLetterOrDigit(character) || character is '_' or '-')))
+        if (value.Length == 0 || value.Any(character => !(IsAsciiLetterOrDigit(character) || character is '_' or '-')))
             throw new InvalidDataException($"Invalid THCRAP {kind} ID '{value}'.");
     }
 
